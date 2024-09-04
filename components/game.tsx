@@ -53,7 +53,13 @@ export function Game(props: IGameProps) {
     <div className="h-[70vh] flex flex-wrap items-center justify-center">
       <div className=" h-[60vmin] w-[60vmin]  flex flex-wrap items-center justify-center gap-[1.5vmin] ">
         {positionArray.map((_, index) => {
-          return <Button handleClick={handleClick} index={index} />;
+          return (
+            <Button
+              handleClick={handleClick}
+              index={index}
+              key={"position" + index}
+            />
+          );
         })}
       </div>
     </div>
