@@ -9,6 +9,8 @@ export function Game(props: IGameProps) {
   const [positionArray, setPositionArray] = useState<string[]>(
     Array(9).fill("")
   );
+  const [winnerMessage, setWinnerMessage] = useState("Tic-Tac-Tow Game");
+  const [gameOver, setGameOver] = useState(false);
   const winPatterns = [
     [0, 1, 2],
     [0, 3, 6],
@@ -21,16 +23,15 @@ export function Game(props: IGameProps) {
   ];
 
   const handleClick = (event: any, position: number) => {
+    const prevArray = [...positionArray];
     if (isPlayerO) {
       setIsPlayerO(false);
-      event.target.innerHTML = "O";
+      prevArray[position] = isPlayerO ? "O" : "X";
     } else {
       setIsPlayerO(true);
-      event.target.innerHTML = "X";
+      prevArray[position] = isPlayerO ? "O" : "X";
     }
     event.target.disabled = true;
-    const prevArray = [...positionArray];
-    prevArray[position] = isPlayerO ? "O" : "X";
     setPositionArray(prevArray);
     checkWinner(prevArray);
   };
@@ -42,25 +43,43 @@ export function Game(props: IGameProps) {
       let pos3Val = array[pattern[2]];
       if (pos1Val != "" && pos2Val != "" && pos3Val != "") {
         if (pos1Val === pos2Val && pos2Val === pos3Val) {
-          console.log("winner is " + pos1Val);
+          setWinnerMessage(pos1Val + " Wins");
+          setGameOver(true);
           return true;
         }
       }
     }
   };
 
+  const handleReset = () => {
+    setIsPlayerO(false);
+    setPositionArray(Array(9).fill(""));
+    setGameOver(false);
+    setWinnerMessage("Tic-Tac-Tow Game");
+  };
   return (
-    <div className="h-[70vh] flex flex-wrap items-center justify-center">
-      <div className=" h-[60vmin] w-[60vmin]  flex flex-wrap items-center justify-center gap-[1.5vmin] ">
-        {positionArray.map((_, index) => {
+    <div className="h-[70vh] flex flex-col items-center justify-top mt-14 gap-5">
+      <h2 className="h-1/3 text-3xl">{winnerMessage}</h2>
+      <div className=" h-[60vmin] w-[60vmin]  flex flex-wrap items-center justify-center gap-[1.5vmin] mt-10 ">
+        {positionArray?.map((value, index) => {
           return (
             <Button
+              value={value}
               handleClick={handleClick}
               index={index}
+              disabled={gameOver}
               key={"position" + index}
             />
           );
         })}
+      </div>
+      <div>
+        <button
+          className="bg-sky-600 py-2 px-5 mt-10 rounded-md"
+          onClick={handleReset}
+        >
+          Reset
+        </button>
       </div>
     </div>
   );
@@ -68,14 +87,19 @@ export function Game(props: IGameProps) {
 export interface IButtonProps {
   handleClick: (event: any, position: number) => void;
   index: number;
+  value: string;
+  disabled: boolean;
 }
 
-const Button = ({ handleClick, index }: IButtonProps) => {
+const Button = ({ handleClick, index, value, disabled }: IButtonProps) => {
   return (
     <button
       key={"position" + index}
       className="bg-white h-[18vmin] w-[18vmin] rounded-sm text-[8vmin] text-[#D90429]"
       onClick={(event) => handleClick(event, index)}
-    ></button>
+      disabled={disabled}
+    >
+      {value}
+    </button>
   );
 };
